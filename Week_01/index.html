@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TicTacToe</title>
+  <style>
+    .cell {
+      width: 100px;
+      height: 100px;
+      display: inline-block;
+      background-color: green;
+      border: 1px solid #cccccc;
+      text-align: center;
+      line-height: 100px;
+      color: red;
+      font-size: 50px;
+      vertical-align: middle;
+    }
+  </style>
+</head>
+<body>
+  <div id="board"></div>
+  <script type="text/javascript">
+    let pattern = [
+      [2, 0, 0],
+      [0, 1, 0],
+      [0, 0, 0]
+    ]
+    let color = 1;
+
+    function show() {
+      let oBoard = document.getElementById('board');
+      oBoard.innerHTML = '';
+      for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+          let cell = document.createElement('div');
+          cell.classList.add('cell')
+          cell.innerText = 
+            pattern[i][j] === 1 ? 'X' : 
+            pattern[i][j] === 2 ? '〇' : '';
+          cell.addEventListener('click', () => move(i, j))
+          oBoard.appendChild(cell);
+        }
+        let oBr = document.createElement('br');
+        oBoard.appendChild(oBr);
+      }
+    }
+
+    function move(x, y) {
+      if(!pattern[x][y]) {
+        pattern[x][y] = 3 - color;
+        color = pattern[x][y];
+        show();
+      }
+    }
+    show();
+  </script>
+</body>
+</html>
