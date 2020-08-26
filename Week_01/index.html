@@ -23,8 +23,8 @@
   <div id="board"></div>
   <script type="text/javascript">
     let pattern = [
-      [2, 0, 0],
-      [0, 1, 0],
+      [0, 0, 0],
+      [0, 0, 0],
       [0, 0, 0]
     ]
     let color = 1;
@@ -37,8 +37,8 @@
           let cell = document.createElement('div');
           cell.classList.add('cell')
           cell.innerText = 
-            pattern[i][j] === 1 ? 'X' : 
-            pattern[i][j] === 2 ? '〇' : '';
+            pattern[i][j] === 2 ? 'X' : 
+            pattern[i][j] === 1 ? '〇' : '';
           cell.addEventListener('click', () => move(i, j))
           oBoard.appendChild(cell);
         }
@@ -49,12 +49,87 @@
 
     function move(x, y) {
       if(!pattern[x][y]) {
-        pattern[x][y] = 3 - color;
-        color = pattern[x][y];
+        pattern[x][y] = color;
+        if(check(pattern, color)) {
+          alert(color === 2 ? 'X is winner' : '〇 is winner')
+        }
+        color = 3 - color;
         show();
+        if(willWin(pattern, color)) {
+          console.log(color === 2 ? 'X will winner' : '〇 will winner')
+        }
       }
     }
+
+    function check(pattern, color) {
+      // 三行
+      for(let i = 0; i < 3; i++) {
+        let win = true
+        for(let j = 0; j < 3; j++) {
+          if(pattern[i][j] !== color) {
+            win = false
+          }
+        }
+        if(win) {
+          return true
+        }
+      }
+      // 三列
+      for(let i = 0; i < 3; i++) {
+        let win = true
+        for(let j = 0; j < 3; j++) {
+          if(pattern[j][i] !== color) {
+            win = false
+          }
+        }
+        if(win) {
+          return true
+        }
+      }
+      // 右斜
+      {
+        let win = true
+        for(let j = 0; j < 3; j++) {
+          if(pattern[j][2-j] !== color) {
+            win = false
+          }
+        }
+        if(win) {
+          return true
+        }
+      }
+      // 左斜
+      {
+        let win = true 
+        for(let j = 0; j < 3; j++) {
+          if(pattern[j][j] !== color) {
+            win = false
+          }
+        }
+        if(win) {
+          return true
+        }
+      }
+      return false
+    }
     show();
+
+    // 判断空白处落子校验是否win
+    function willWin(pattern, color) {
+      for(let i = 0; i < 3; i++) {
+        for(let j = 0; j < 3; j++) {
+          if(pattern[i][j]) {
+            continue
+          }
+          let temp = JSON.parse(JSON.stringify(pattern))
+          temp[i][j] = color
+          if(check(temp, color)) {
+            return true
+          } 
+        }
+      }
+      return false
+    }
   </script>
 </body>
 </html>
