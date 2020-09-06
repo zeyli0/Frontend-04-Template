@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    .cell {
+      width: 6px;
+      height: 6px;
+      display: inline-block;
+      background-color: gray;
+      border-right: 1px solid #ffffff;
+      border-bottom: 1px solid #ffffff;
+      vertical-align: top;
+    }
+    #container {
+      width: 701px;
+      font-size: 0;
+    }
+  </style>
+</head>
+<body>
+  <button onclick=" sessionStorage['map'] = JSON.stringify(map) ">保存</button>
+
+  <div id="container"></div>
+
+  <script type="text/javascript">
+    class Sorted {
+      constructor(data, compare) {
+        this.data = data.slice();
+        this.compare = compare || ((a, b) => a - b);
+      }
+      take() {
+        if(!this.data.length) {
+          return
+        }
+        let min = this.data[0]
+        let minIndex = 0
+
+        for(let i = 1; i<this.data.length; i++) {
+          if(this.compare(this.data[i], min) < 0) {
+            min = this.data[i]
+            minIndex = i
+          }
+        }
+
+        this.data[minIndex] = this.data[this.data.length - 1] // o(1)
+        this.data.pop()
+        return min
+      }
+      give(v) {
+        this.data.push(v)
+      }
+    }
+
+    let map = sessionStorage['map'] ? JSON.parse(sessionStorage['map']) : Array(1000).fill(0)
+
+    let container = document.getElementById('container')
+
+    let mousemove = false
+    let clear = false
+
+    for(let i = 0; i < 100; i++ ) {
+      for(let j = 0; j < 100; j++ ) {
+        let cell = document.createElement('div')
+        cell.classList.add('cell')
+
+        if(map[100 * i + j] === 1) {
+          cell.style.backgroundColor = 'black'
+        }
+        cell.addEventListener('mousemove', () => {
+          if(mousemove) {
+            if(clear) {
+              cell.style.backgroundColor = ''
+              map[100 * i + j] = 0
+            } else {
+              cell.style.backgroundColor = 'black'
+              map[100 * i + j] = 1
+            }
+          }
+          
+        }, false)
+        container.appendChild(cell)
+      }
+    }
+
+    document.addEventListener('mousedown', e => {
+      mousemove = true
+      clear = (e.which === 3)
+    })
+    document.addEventListener('mouseup', () => {
+      mousemove = false
+    })
+    document.addEventListener('contextmenu', e => {
+      e.preventDefault()
+    })
+
+    function sleep(t) {
+      return new Promise(resolve => {
+        setTimeout(resolve, t)
+      })
+    }
+
+    // 广度优先搜索
+    async function findPath(map, start, end) {
+      console.time('time')
+      let table = Object.create(map)
+      let queue = new Sorted([start], (a, b) => distance(a) - distance(b))
+
+      async function insert(x, y, pre) {
+        // 碰到周围墙
+        if(x < 0 || x>=100 || y<0 || y>=100) {
+          return
+        }
+        // 已经进入队列的点
+        if(table[100*y +x]) {
+          
+          return 
+        }
+        // await sleep(30)
+        container.children[100*y +x].style.backgroundColor = 'lightgreen'
+        
+        table[100*y + x] = pre;
+        queue.give([x, y]);
+      }
+
+      function distance(point) {
+        return (point[0] - end[0])**2 + (point[1] - end[1]) ** 2
+      }
+
+      console.log('--------',queue )
+      while(queue.data.length) {
+        let [x , y] = queue.take()
+        console.log(x, y)
+        if(x === end[0] && y === end[1]) {
+          let path = []
+          while(x != start[0] || y != start[1]) {
+            path.push(map[100*y + x]);
+            [x, y] = table[100* y + x];
+            await sleep(30);
+            container.children[100* y +x].style.backgroundColor = 'purple';
+          }
+          console.timeEnd('time')
+          return path;
+        }
+        await insert(x-1, y, [x, y])
+        await insert(x, y-1, [x, y])
+        await insert(x+1, y, [x, y])
+        await insert(x, y+1, [x, y])
+
+        await insert(x-1, y-1, [x, y])
+        await insert(x+1, y-1, [x, y])
+        await insert(x-1, y+1, [x, y])
+        await insert(x+1, y+1, [x, y])
+
+      }
+      return null
+    }
+
+    // 深度优先搜索
+    async function path2(map, start, end) {
+      console.time('time2')
+      let table = Object.create(map)
+      let queue = [start] // 队列
+
+      async function insert(x, y, pre) {
+        // 碰到周围墙
+        if(x < 0 || x>=100 || y<0 || y>=100) {
+          return
+        }
+        // 已经进入队列的点
+        if(table[100*y +x]) {
+          return 
+        }
+        table[100*y + x] = pre
+        queue.push([x, y])
+      }
+
+      while(queue.length) {
+        let [x , y] = queue.pop()
+        console.log(x, y)
+        if(x === end[0] && y === end[1]) {
+          let path = []
+          while(x != start[0] || y != start[1]) {
+            path.push(map[100*y + x]);
+            [x, y] = table[100*y + x];
+            await sleep(1);
+            container.children[100*y+x].style.backgroundColor = 'purple'
+          }
+          console.timeEnd('time2')
+          return path
+        }
+        await insert(x-1, y, [x, y])
+        await insert(x, y-1, [x, y])
+        await insert(x+1, y, [x, y])
+        await insert(x, y+1, [x, y])
+
+        await insert(x-1, y-1, [x, y])
+        await insert(x+1, y-1, [x, y])
+        await insert(x-1, y+1, [x, y])
+        await insert(x+1, y+1, [x, y])
+      }
+      return null
+    }
+
+  </script>
+</body>
+</html>
