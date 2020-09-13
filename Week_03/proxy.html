@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <div>
+    <input id="r" type="range" min=0 max=255>
+    <input id="g" type="range" min=0 max=255>
+    <input id="b" type="range" min=0 max=255>
+    <div id="color" style="width: 50px; height: 50px;"> 
+
+    </div>
+  </div>
+  <script>
+    let callbacks = new Map()
+    let reactivies = new Map() // 调用reactives加缓存，不要每次都new一个新的
+
+    let usedRectives = []
+    let object = {
+      r: 1,
+      g: 1,
+      b: 1
+    }
+    let po = reactive(object)
+
+    // 监听某个变量
+    effect(() => {
+      document.getElementById("r").value = po.r
+    })
+    effect(() => {
+      document.getElementById("g").value = po.g
+    })
+    effect(() => {
+      document.getElementById("b").value = po.b
+    })
+    effect(() => {
+      document.getElementById("color").style.backgroundColor = `rgb(${po.r}, ${po.g}, ${po.g})`
+    })
+    document.getElementById("r").addEventListener("input", event => po.r = event.target.value)
+    document.getElementById("g").addEventListener("input", event => po.g = event.target.value)
+    document.getElementById("b").addEventListener("input", event => po.g = event.target.value)
+    // 监听
+    function effect(callback) {
+      // callbacks.push(callback)
+      usedRectives = []
+      callback()
+      console.log(usedRectives)
+      for(let reactivity of usedRectives) {
+        if(!callbacks.has(reactivity[0])) {
+          callbacks.set(reactivity[0], new Map())
+        }
+        if(!callbacks.get(reactivity[0]).has(reactivity[1])) {
+          callbacks.get(reactivity[0]).set(reactivity[1], [])
+        }
+        callbacks.get(reactivity[0]).get(reactivity[1]).push(callback)
+      }
+    }
+
+    // 
+    function reactive(object) {
+      // 如果已经存在调用缓存中的
+      if(reactivies.has(object)) {
+        return reactivies.get(object)
+      }
+
+      let proxy =  new Proxy(object, {
+        set(obj, prop, val) {
+          if(callbacks.get(obj)) {
+            if(callbacks.get(obj).get(prop)){
+              for(let callback of callbacks.get(obj).get(prop)) {
+                callback()
+              }
+            }
+          }
+          
+          return obj[prop] = val
+        },
+        get(obj, prop) {
+          usedRectives.push([obj, prop])
+          // 处理po.a.b 的数据
+          if(typeof obj[prop] === "object") {
+            // 每次调用时要保证为同一个proxy
+            return reactive(obj[prop])
+          }
+          return obj[prop]
+        }
+      })
+
+      reactivies.set(object, proxy)
+      return proxy
+    }
+
+    // 通过调用该函数获取监听的变量
+  </script>
+</body>
+</html>

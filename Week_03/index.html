@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>字符串分析算法-字典树</title>
+</head>
+<body>
+  <script>
+    let $ = Symbol("$")
+    class Trie {
+      constructor() {
+        this.root = Object.create(null) // 不继承任何原型方法，即原型链没有上一级
+      }
+      insert(word) {
+          let node = this.root
+          for(let c of word) {
+            if(!node[c]) {
+              node[c] = Object.create(null)
+            }
+            node = node[c]
+          }
+          // 单词截至符
+          if(!($ in node)) {
+            node[$] = 0
+          }
+          node[$]++
+      }
+      most() {
+        let max = 0
+        let maxWord = null;
+        let visit = (node, word) => {
+          // 这个树上么个节点
+          if(node[$] && node[$] > max) {
+            max = node[$]
+            maxWord = word // 出现最多的次数的单词
+          }
+          for(let p in node) {
+            visit(node[p], word + p)
+          }
+        }
+        visit(this.root, "")
+        console.log(maxWord, max)
+      }
+    }
+
+    function randomWord(length) {
+      var s = ""
+      for(let i = 0; i < length; i++) {
+        s += String.fromCharCode(Math.random() * 26 + "a".charCodeAt(0))
+      }
+      return s;
+    }
+
+    let trie = new Trie()
+
+    for(let i = 0; i < 100000; i++) {
+      trie.insert(randomWord(4))
+    }
+  </script>
+</body>
+</html>
