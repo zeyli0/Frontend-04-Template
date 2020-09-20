@@ -48,6 +48,7 @@
 
         let reg = new RegExp(subPttern.replace(/\?/g, "[\\s\\S]"), "g")
         reg.lastIndex = lastIndex
+        // console.log(reg.exec(source))
         // 如果没有匹配到
         if(!reg.exec(source)) {
           return false
