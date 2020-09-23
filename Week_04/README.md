@@ -97,4 +97,4 @@ String：为了支持下标运算，String 的正整数属性访问会去字符�
 Arguments：arguments 的非负整数型下标属性跟对应的变量联动。
 模块的 namespace 对象：特殊的地方非常多，跟一般对象完全不一样，尽量只用于 import 吧。
 类型数组和数组缓冲区：跟内存块相关联，下标运算比较特殊。
-bind 后的 function：跟原来的函数相关联。
+bind 后的 function：跟原来的函数相关联。 
