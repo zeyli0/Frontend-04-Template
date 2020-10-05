@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <script>
+    
+    function stringToNumber(str) {
+      let result = null;
+      if(typeof str === "string") {
+        result = Number(str)
+      } else if(typeof str === "object") {
+        result = Number(str)
+      }
+      console.log( typeof result)
+      return result
+    }
+
+    // number 格式的定义
+    numberToString(11)
+    numberToString(new Number(11))
+    let num_8 = 0o10;
+
+    function numberToString(num) {
+      let result = null;
+      if(typeof num === "number") {
+        result = num.toString()
+      } else if(typeof num === "object") {
+        result = num.toString()
+      }
+      return result
+    }
+  </script>
+</body>
+</html>
