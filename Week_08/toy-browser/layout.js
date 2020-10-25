@@ -331,7 +331,11 @@ function layout(element) {
 
       if(align === 'stretch') {
         itemStyle[crossStart] = crossBase;
-        itemStyle[crossEnd] = crossBase + crossSign * ((itemStyle[crossSize] !== null && itemStyle[crossSize])); // ??? 
+        itemStyle[crossEnd] = 
+        crossBase + crossSign * 
+        ((itemStyle[crossSize] !== null && itemStyle[crossSize] !== void 0) 
+        ? itemStyle[crossSize]
+        : lineCrossSize); 
         itemStyle[crossSize] = crossSign * (itemStyle[crossEnd] - itemStyle[crossStart]);
       }
     }

@@ -19,8 +19,6 @@
 根据每一行中最大元素尺寸计算行高
 根据行高flex-align和item-align，确定元素具体位置
 
-注： 计算交叉轴if(align === 'stretch')  中itemStyle[crossEnd] 后面代码未知？？？
-
 第五步，绘制单个元素
 准备一个图形环境 images库 npm install images
 绘制在一个viewport上进行的
